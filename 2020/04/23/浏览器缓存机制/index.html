@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="BitHobo">
+
+
+
+
+
+<title>浏览器缓存机制 | Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">BitHobo&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">BitHobo&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">浏览器缓存机制</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">BitHobo</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">April 23, 2020&nbsp;&nbsp;10:07:55</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h5 id="缓存发展史："><a href="#缓存发展史：" class="headerlink" title="缓存发展史："></a>缓存发展史：</h5><p>HTTP/1.0提出Expires(过期时间)和Pragma给客户端设定资源的缓存策略，Pragma字段值为no-cache(RFC中规定Pragma有且仅有no-cache作为字段值)时，与Cache-Control: no-cache作用相同；<strong>Expires用来启用缓存和定义缓存时间</strong>，使用一个GMT(格林尼治时间)作为值(Expires为无效的日期格式时，等同于已经过期)。<strong>如果Pragma和Expires同时存在，则起作用的会是Pragma</strong>。</p>
+<p>由于Expires所定义的缓存时间是相对服务器上的时间而言的，无法保证和客户端本地时间统一。HTTP/1.1增加Cache-Control(缓存控制)中的max-age替代Expires来定义缓存过期时间。若报文中同时出现了Pragma: no-cache、Expires和Cache-Control: max-age，优先级从高到低分别是Pragma: no-cache &gt; Cache-Control: max-age &gt; Expires。</p>
+<p>上述首部字段能让客户端确认资源的缓存策略与过期时间，在下次请求该资源时<strong>决定是否向服务器发送请求</strong>，Last-Modified与Etag可以实现缓存文件是否更新的验证，提升缓存的复用率。</p>
+<p>HTTP/1.1风格的Etag是对HTTP/1.0风格的Last-Modified的补充，两者没有优先级和替代性。</p>
+<h5 id="如何判断资源采取的缓存策略："><a href="#如何判断资源采取的缓存策略：" class="headerlink" title="如何判断资源采取的缓存策略："></a>如何判断资源采取的缓存策略：</h5><ol>
+<li>Cache-Control: no-store：响应不会被缓存到任意的磁盘或者内存里，优先级高于Pragma: no-cache与Expires</li>
+<li>Cache-Control: no-cache/Pragma: no-cache：客户端仍会缓存响应，只不过每次不会直接用缓存，而得先进行协商缓存，优先级高于Expires与Cache-Control: max-age</li>
+<li>Cache-Control: max-age：客户端缓存响应，在指定时间内都200 from cache，优先级高于Expires</li>
+</ol>
+<p>即缓存策略按照优先级排序共有三档：no-store，no-cache(协商缓存)，强缓存。</p>
+<p>Pragma/Expires/Cache-Control/Last-Modified/Etag，响应头只包含Etag会启用协商缓存，只包含Last-Modified会启用强缓存。</p>
+<h5 id="想让一个资源能缓存，有三种方式，按照解析优先级排序如下："><a href="#想让一个资源能缓存，有三种方式，按照解析优先级排序如下：" class="headerlink" title="想让一个资源能缓存，有三种方式，按照解析优先级排序如下："></a>想让一个资源能缓存，有三种方式，按照解析优先级排序如下：</h5><ol>
+<li>HTTP/1.1风格的<strong>Cache-Control</strong>响应头中的<strong>max-age</strong>，如Cache-Control: max-age=86400(以秒为单位)</li>
+<li>HTTP/1.0风格的<strong>Expires</strong>响应头，如expires: Thu, 19 Nov 2020 02:40:03 GMT</li>
+<li><strong>Last-Modified</strong>响应头</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">HTTP/<span class="number">2</span> <span class="number">200</span></span><br><span class="line"><span class="built_in">Date</span>: Wed, <span class="number">27</span> Mar <span class="number">2019</span> <span class="number">22</span>:<span class="number">00</span>:<span class="number">00</span> GMT</span><br><span class="line">Last-Modified: Wed, <span class="number">27</span> Mar <span class="number">2019</span> <span class="number">12</span>:<span class="number">00</span>:<span class="number">00</span> GMT</span><br></pre></td></tr></table></figure>
+
+<p>这个响应，没有Cache-Control和Expires，浏览器就会用隐式的<strong>启发式的(heuristic)缓存</strong>，HTTP规范推荐的算法为Date响应头的时间减去Last-Modified的时间，得出的时长再除以10。</p>
+<h5 id="如何判断缓存过期："><a href="#如何判断缓存过期：" class="headerlink" title="如何判断缓存过期："></a>如何判断缓存过期：</h5><p>通过HTTP/1.0风格的<strong>Expires: GMT</strong>响应头和HTTP/1.1风格的<strong>Cache-Control: max-age</strong>响应头来判断资源缓存是否过期(强缓存阶段)。</p>
+<p>如果没有过期，则200 from cache；过期则需要重新核对资源的缓存过期时间(协商缓存阶段)，可通过HTTP/1.0风格的<strong>If-Modified-Since/Last-Modified</strong>和HTTP/1.1风格的<strong>If-None-Match/Etag</strong>进行验证(RFC规定，如果ETag和Last-Modified都有，则必须一次性发送If-Modified-Since和If-None-Match给服务器，两者没有优先级)。</p>
+<p>点击浏览器的后退前进按钮时，浏览器会尽量用本地缓存来重新打开页面(即使缓存已经过期)，只有Cache-Control: no-store导致硬盘上没有缓存才能解决。</p>
+<h5 id="缓存过期后如何更新缓存："><a href="#缓存过期后如何更新缓存：" class="headerlink" title="缓存过期后如何更新缓存："></a>缓存过期后如何更新缓存：</h5><p>在HTTP客户端(浏览器或者缓存服务器)上，如果某个URL对应的缓存过期了，客户端会再次向该URL发送一个条件请求(带有If-Modified-Since/If-None-Match请求头)，如果服务端(缓存服务器或者源站)返回的状态码是304(没有响应体)，则客户端会根据该304响应所包含的一些响应头(Date、Last-Modified、Cache-Control等)<strong>重新计算出这条缓存的过期时间</strong>，比如：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HTTP/<span class="number">2</span> <span class="number">304</span></span><br><span class="line">Cache-Control: max-age=<span class="number">86400</span></span><br></pre></td></tr></table></figure>
+
+<p>这样的304响应，就能让这条缓存重新续命一天；如果返回的状态码是200，则整条缓存会被新返回的响应体替换掉。</p>
+<h5 id="Cache-Control常见属性："><a href="#Cache-Control常见属性：" class="headerlink" title="Cache-Control常见属性："></a>Cache-Control常见属性：</h5><ul>
+<li>max-age=86400(单位为秒)</li>
+<li>private：响应只能在私有缓存中被缓存，不能放在代理缓存上</li>
+<li>public：响应可以在代理缓存中被缓存</li>
+<li>no-cache：客户端仍会缓存响应，只不过每次不会直接用缓存，而得先进行协商缓存</li>
+<li>no-store：响应不会被缓存到任意的磁盘或者内存里</li>
+</ul>
+<h5 id="Etag对Last-Modified的补充："><a href="#Etag对Last-Modified的补充：" class="headerlink" title="Etag对Last-Modified的补充："></a>Etag对Last-Modified的补充：</h5><ol>
+<li>文件打开，未修改，保存后Last-Modified改变导致客户端不该更新的资源被更新</li>
+<li>文件打开，修改，迅速保存是无法判断的，If-Modified-Since能检查到的粒度是秒级的，Last-Modified不改变导致客户端该更新的资源未被更新</li>
+<li>某些服务器不能精确得到文件的最后修改时间</li>
+</ol>
+<h5 id="浏览器行为对应缓存策略的区别："><a href="#浏览器行为对应缓存策略的区别：" class="headerlink" title="浏览器行为对应缓存策略的区别："></a>浏览器行为对应缓存策略的区别：</h5><ul>
+<li>输入URL+回车/点击书签访问：正常缓存策略，缓存未过期则200 from cache</li>
+<li>F5/点击工具栏中的刷新按钮/右键菜单重新加载：无论缓存是否过期，都需要发送一个条件请求(带有If-Modified-Since/If-None-Match请求头)</li>
+<li>Ctl+F5：无论缓存是否过期，彻底重拿一份新的资源过来</li>
+</ul>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2020/04/23/%E5%89%8D%E7%AB%AF%E9%94%99%E8%AF%AF%E7%9B%91%E6%8E%A7%E3%80%81%E6%94%B6%E9%9B%86%E4%B8%8E%E4%B8%8A%E6%8A%A5/">前端错误监控、收集与上报</a>
+            
+            
+            <a class="next" rel="next" href="/2020/04/23/%E6%B5%8F%E8%A7%88%E5%99%A8%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/">浏览器工作原理</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© BitHobo | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

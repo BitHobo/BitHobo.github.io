@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="BitHobo">
+
+
+
+
+
+<title>浏览器工作原理 | Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">BitHobo&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">BitHobo&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">浏览器工作原理</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">BitHobo</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">April 23, 2020&nbsp;&nbsp;9:31:52</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h5 id="进程和线程"><a href="#进程和线程" class="headerlink" title="进程和线程"></a>进程和线程</h5><p>进程是cpu资源分配的最小单位，线程是cpu调度的最小单位。</p>
+<p>一个进程就是一个程序的运行实例。启动一个程序的时候，操作系统会为该程序创建一块内存，用来存放代码、运行中的数据和一个执行任务的主线程，我们把这样的一个运行环境叫进程。</p>
+<p>线程是依附于进程的，而进程中使用多线程并行处理能提升运算效率。</p>
+<ul>
+<li>进程中的任意一线程执行出错，都会导致整个进程的崩溃。</li>
+<li>线程之间共享进程中的数据。</li>
+<li>当一个进程关闭之后，操作系统会回收进程所占用的内存。</li>
+<li>进程之间的内容相互隔离。</li>
+</ul>
+<h5 id="浏览器单进程到多进程架构演化"><a href="#浏览器单进程到多进程架构演化" class="headerlink" title="浏览器单进程到多进程架构演化"></a>浏览器单进程到多进程架构演化</h5><p>页面是运行在单独的渲染进程中的，同时页面里的插件也是运行在单独的插件进程之中，而进程之间是通过IPC机制进行通信；一个页面就是一个渲染进程，负责解析、渲染、JavaScript执行等；当JavaScript运行阻塞渲染进程，不会影响到其他页面；关闭一个页面时，整个渲染进程也会被关闭，之后该进程所占用的内存都会被系统回收，解决页面内存泄漏问题；插件进程和渲染进程在沙箱中运行，恶意程序无法突破沙箱去获取系统权限。</p>
+<h5 id="浏览器目前的多进程架构"><a href="#浏览器目前的多进程架构" class="headerlink" title="浏览器目前的多进程架构"></a>浏览器目前的多进程架构</h5><p>包括一个浏览器主进程、一个GPU进程、一个网络进程、多个渲染进程与多个插件进程。</p>
+<ul>
+<li>浏览器进程：负责界面显示、用户交互、子进程管理；将Renderer进程得到的内存中的Bitmap，绘制到用户界面上；同时提供存储等功能</li>
+<li>渲染进程：浏览器为每个Tab标签创建一个渲染进程，将代码转换成可交互的网页</li>
+<li>GPU进程：网页、浏览器UI界面的绘制</li>
+<li>网络进程：主要负责页面的网络资源加载</li>
+<li>插件进程：插件运行通过插件进程来隔离，以保证插件进程崩溃不会对浏览器和页面造成影响</li>
+</ul>
+<h5 id="从输入URL到页面展示，这中间发生了什么（简要流程）"><a href="#从输入URL到页面展示，这中间发生了什么（简要流程）" class="headerlink" title="从输入URL到页面展示，这中间发生了什么（简要流程）"></a>从输入URL到页面展示，这中间发生了什么（简要流程）</h5><ol>
+<li>地址栏会判断输入的关键字是搜索内容，还是请求的URL；如果是搜索内容，地址栏会使用浏览器默认的搜索引擎，来合成新的带搜索关键字的URL；如果判断输入内容符合URL规则，则加上协议，合成为完整的URL</li>
+<li>浏览器开始加载一个地址，标签页上的图标进入加载状态；此时的页面显示仍然是之前的内容（需要等待提交文档阶段，即请求的响应体数据被渲染进程接收完毕后页面内容才会被替换）</li>
+<li>浏览器进程会通过进程间通信（IPC）把URL请求发送至网络进程；查找资源是否有缓存且缓存未过期；如果没有缓存或者需要确认缓存过期情况，那么进入网络请求流程</li>
+<li>先进行DNS解析（查找DNS缓存，没有则进行DNS迭代解析流程）</li>
+<li>利用IP地址建立TCP连接，构建请求信息（cookie等数据），向服务器发送请求信息</li>
+<li>收到响应后，网络进程开始解析响应头；如果是301、302重定向，网络进程会从响应头Location读取重定向的地址，发起新的请求，重头开始；通过Content-Type来进行不同的后续处理流程，如果是HTML，那么浏览器则会继续进行导航流程，接下来就需要准备渲染进程</li>
+<li>默认情况下，浏览器会为每个页面分配一个渲染进程；渲染进程准备好之后，还不能立即进入文档解析状态，因为此时的文档数据还在网络进程中，并没有提交给渲染进程，所以下一步就进入了提交文档阶段</li>
+<li>“提交文档”的消息是由浏览器进程发出的，渲染进程接收到“提交文档”的消息后，会和网络进程建立传输数据的“管道”；等文档数据传输完成之后，渲染进程会返回“确认提交”的消息给浏览器进程；浏览器进程在收到“确认提交”的消息后，会更新浏览器界面状态，包括了安全状态、地址栏的URL、前进后退的历史状态，并更新Web页面</li>
+<li>一旦文档被提交，渲染进程便开始页面解析和子资源加载；一旦页面生成完成，渲染进程会发送一个消息给浏览器进程，浏览器接收到消息后，会停止标签图标上的加载动画</li>
+</ol>
+<h5 id="渲染流程"><a href="#渲染流程" class="headerlink" title="渲染流程"></a>渲染流程</h5><ol>
+<li>构建DOM树：字符 -&gt; 令牌（Token） -&gt; 节点对象（Node，包含节点父子关系） -&gt; DOM Tree</li>
+<li>构建CSSOM：将CSS文本转换为浏览器可以理解的结构styleSheets（CSSOM）；属性值标准化（如：2rem -&gt; 24px；red -&gt; rgb(255,0,0)）</li>
+<li>Layout：额外地构建一棵只包含可见元素（display不为none）布局树（结构基本上就是复制DOM树的结构）；根据继承规则和层叠规则计算出布局树中每个节点的具体样式（Render Tree）；根据布局树计算每个元素（布局树节点）的几何坐标位置，并将这些信息保存在布局树（Layout Tree）中。通过样式计算和计算布局就完成了最终布局树的构建</li>
+<li>分层：渲染引擎还需要为特定的节点生成专用的图层，并生成一棵对应的图层树（Layer Tree）；拥有层叠上下文属性的元素会被提升为单独的一层，需要剪裁（clip，由内部元素超出范围后隐藏所产生）的地方也会被创建为图层</li>
+<li>绘制：在完成图层树的构建之后，渲染引擎会对图层树中的每个图层进行绘制；把一个图层的绘制拆分成很多小的绘制指令，再把这些指令按照顺序组成一个待绘制列表；所以在图层绘制阶段，输出的内容就是这些待绘制列表</li>
+<li>分块：实际上绘制操作是由渲染引擎中的合成线程来完成的；当图层的绘制列表准备好之后，主线程会把该绘制列表提交（commit）给合成线程；合成线程会将图层划分为图块（tile，复合图层），然后合成线程会按照视口附近的图块来优先生成位图，实际生成位图的操作是由栅格化来执行（从微观层面提升了渲染效率，是一种优化手段；渲染流程本身的基本步骤就是分层、光栅化、合成）</li>
+<li>光栅化：渲染进程维护了一个栅格化的线程池，所有的图块栅格化都是在线程池内执行的；栅格化过程都会使用GPU来加速生成，使用GPU生成位图的过程叫快速栅格化，或者GPU栅格化，生成的位图被保存在GPU内存中</li>
+<li>合成：一旦所有图块都被光栅化，合成线程就会生成一个绘制图块的命令，然后将该命令提交给浏览器进程；浏览器进程将其页面内容绘制到内存中，最后再将内存显示在屏幕上</li>
+</ol>
+<p>简要概述：DOM -&gt; styleSheets -&gt; layout -&gt; layer -&gt; paint（每一个图层拆分成绘制指令集） -&gt; tiles（将图层分成图块） -&gt; raster（光栅化） -&gt; DrawQuad（绘制图块命令） -&gt; display</p>
+<p>transform属性就是<strong>合成线程直接对图层进行变换后再光栅化</strong>，不需要经过layout、layer、paint，显卡处理这些操作驾轻就熟，所以这个合成过程时间非常短</p>
+<h5 id="JavaScript执行流程"><a href="#JavaScript执行流程" class="headerlink" title="JavaScript执行流程"></a>JavaScript执行流程</h5><ul>
+<li>编译器（Compiler）：将代码编译成机器码（二进制文件）并且可以保留，使得机器可以直接执行</li>
+<li>解释器（Interpreter）：每次运行时都需要将代码编译成字节码，并对字节码进行解释执行</li>
+</ul>
+<ol>
+<li>分词（tokenize），又称为词法分析，其作用是将一行行的源码拆解成一个个token（语法上不可能再分的、最小的单个字符或字符串）</li>
+<li>解析（parse），又称为语法分析，其作用是将上一步生成的token数据根据语法规则转为AST；如果源码存在语法错误，这一步就会终止，并抛出一个“语法错误”</li>
+<li>生成该段代码的执行上下文，执行上下文包括变量环境（var与函数的声明提前）、词法环境（一个小型栈结构，维护let与const声明的变量的块级作用域）、词法作用域链与this</li>
+<li>根据AST生成字节码（字节码介于AST与机器码，机器码执行效率高但是消耗内存大，所以采用了字节码）</li>
+<li>解释器逐条解释执行字节码；如果有一段代码被重复执行多次，称为热点代码（HotSpot），那么后台的编译器就会把该段热点的字节码编译为高效的机器码，当再次执行这段被优化的代码时，只需要执行编译后的机器码就可以了，这是一个优化手段，称为即时编译（JIT）</li>
+</ol>
+<h5 id="Event-Loop"><a href="#Event-Loop" class="headerlink" title="Event Loop"></a>Event Loop</h5><p>消息队列包含了很多内部消息类型，如输入事件（鼠标滚动、点击、移动）、微任务、文件读写、WebSocket、JavaScript定时器等等，除此之外，消息队列中还包含了很多与页面相关的事件，如JavaScript执行、解析DOM、样式计算、布局计算、CSS动画等。</p>
+<p>通常我们把消息队列中的任务称为宏任务，每个宏任务中都包含了一个微任务队列，在执行宏任务的过程中，如果DOM有变化，那么就会将该变化添加到微任务列表中，这样就不会影响到宏任务的继续执行，微任务在该宏任务之后执行，因此也就解决了执行效率和实时性的问题。</p>
+<p>浏览器除了正常使用的消息队列之外，还有另外一个消息队列（延时队列，hashmap结构），这个队列中维护了需要延迟执行的任务列表，包括了定时器和内部一些需要延迟执行的任务。</p>
+<p>总结：执行完一个宏任务后，执行完当前微任务队列中所有微任务（如果在执行微任务的过程中，产生了新的微任务，同样会将该微任务添加到当前微任务队列中），在延时队列根据发起时间和延迟时间计算出到期的任务，然后执行这些到期的任务（每个到期的任务执行后依旧会执行完当前微任务队列），再去执行消息队列下一个宏任务。</p>
+<h5 id="线程和协程"><a href="#线程和协程" class="headerlink" title="线程和协程"></a>线程和协程</h5><p>协程是一种比线程更加轻量级的存在。可以把协程看成是跑在线程上的任务，一个线程上可以存在多个协程，但是在线程上同时只能执行一个协程。</p>
+<p>Generator通过next进入生成器协程；yield暂停协程，返回信息给父协程（JavaScript主线程）。</p>
+<p>async/await通过await创建一个Promise对象，暂停当前协程的执行，将控制权转交给父协程（JavaScript主线程）执行，同时会将Promise对象返回给父协程；某一时刻Promise对象resolve，将任务提交给微任务队列；父协程执行完当前宏任务后，开始执行微任务；执行await创建的Promise对象的then回调，该回调暂停主线程，将值传给协程进行处理；协程处理完成后结束自己，将控制权转交给父协程。</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2020/04/23/%E6%B5%8F%E8%A7%88%E5%99%A8%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/">浏览器缓存机制</a>
+            
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© BitHobo | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>

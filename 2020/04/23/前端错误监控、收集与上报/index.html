@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="BitHobo">
+
+
+
+
+
+<title>前端错误监控、收集与上报 | Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">BitHobo&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">BitHobo&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">前端错误监控、收集与上报</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">BitHobo</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">April 23, 2020&nbsp;&nbsp;10:13:44</a>
+                        </span>
+                    
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h5 id="脚本错误信息收集："><a href="#脚本错误信息收集：" class="headerlink" title="脚本错误信息收集："></a>脚本错误信息收集：</h5><h6 id="window-onerror："><a href="#window-onerror：" class="headerlink" title="window.onerror："></a>window.onerror：</h6><ul>
+<li>要把window.onerror这个代码块分离出去，并且比其他脚本先执行即可捕捉到语法错误（冒泡阶段处理错误）</li>
+<li>无论是异步（setTimeout等）还是非异步都能捕获到</li>
+<li>由于网络请求异常事件不会冒泡，需要在捕获阶段进行处理，window.addEventListener(‘error’, function(){}, true)；<strong>不能捕获promise的错误信息</strong></li>
+<li>跨域资源需要专门处理，script脚本设置为：crossorigin=”anonymous”；同时服务器添加 Access-Control-Allow-Origin 以指定允许哪些域的请求访问</li>
+<li>window.onerror函数消化错误，需要显示返回true，以保证错误不会向上抛出，控制台也就不会看到一堆错误提示</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"> <span class="built_in">window</span>.onerror = <span class="function"><span class="keyword">function</span> (<span class="params">error</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(error);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span> <span class="comment">//此时不会在控制台显示浏览器自带的红色错误提示</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> a = b</span><br><span class="line"><span class="comment">//这里出错，进行console.log(error)，error是字符串</span></span><br><span class="line"><span class="comment">//Uncaught ReferenceError: b is not defined</span></span><br></pre></td></tr></table></figure>
+
+<h6 id="window-addEventListener-‘error’-function-true"><a href="#window-addEventListener-‘error’-function-true" class="headerlink" title="window.addEventListener(‘error’, function(){}, true)"></a>window.addEventListener(‘error’, function(){}, true)</h6><ul>
+<li>网络加载错误是不会进行事件冒泡的，需要在网络加载错误捕获阶段进行处理</li>
+</ul>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="javascript">    <span class="built_in">window</span>.addEventListener(<span class="string">'error'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">error</span>) </span>&#123;</span></span><br><span class="line"><span class="javascript">        <span class="built_in">console</span>.log(error);</span></span><br><span class="line"><span class="actionscript">        error.preventDefault() <span class="comment">//此时不会在控制台显示浏览器自带的红色错误提示</span></span></span><br><span class="line"><span class="actionscript">        <span class="comment">//如果使用return true替代error.preventDefault()还是会在控制台显示浏览器自带的红色错误提示</span></span></span><br><span class="line"><span class="actionscript">    &#125;, <span class="literal">true</span>)</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"./JavaScript.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span> <span class="attr">href</span>=<span class="string">"./style.css"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">"./image.jpg"</span> <span class="attr">alt</span>=<span class="string">""</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="actionscript">    <span class="comment">//网络加载错误，console.log(error)，error是Event事件对象</span></span></span><br><span class="line"><span class="actionscript">    <span class="comment">//可通过Event事件对象中的target属性得知资源详情</span></span></span><br><span class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>无论是异步（setTimeout等）还是非异步都能捕获到；可以拿到出错的信息，堆栈，出错的文件、行号、列号</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">window</span>.addEventListener(<span class="string">'error'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">error</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(error);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">&#125;, <span class="literal">true</span>)</span><br><span class="line">setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> a = b</span><br><span class="line">&#125;, <span class="number">1000</span>)</span><br><span class="line"><span class="comment">//console.log(error)，error是ErrorEvent事件对象</span></span><br><span class="line"><span class="comment">//以下是ErrorEvent对象部分信息展示</span></span><br><span class="line">ErrorEvent = &#123;</span><br><span class="line">    message: <span class="string">"Uncaught ReferenceError: b is not defined"</span>,</span><br><span class="line">    filename: <span class="string">"file:///C:/Users/Air/Desktop/index.html"</span>,</span><br><span class="line">    lineno: <span class="number">14</span>,</span><br><span class="line">    colno: <span class="number">21</span>,</span><br><span class="line">    type: <span class="string">"error"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h6 id="try-catch："><a href="#try-catch：" class="headerlink" title="try catch："></a>try catch：</h6><ul>
+<li>无法捕捉到语法错误，只能捕捉运行时错误</li>
+<li>在代码中手动添加或者通过自动化工具经AST对每个函数添加try catch</li>
+<li>try catch只能捕获同步代码的异常，对回调、setTimeout、promise等无能为力</li>
+<li>使用try catch，我们可以保证页面不崩溃，并对错误进行兜底处理，这是一个非常好的习惯；但是代码入侵性强</li>
+</ul>
+<h6 id="Promise错误处理："><a href="#Promise错误处理：" class="headerlink" title="Promise错误处理："></a>Promise错误处理：</h6><ul>
+<li>当一个promise被reject，就会引发catch：1. 调用reject(reason) 2. 在promise构造器函数中代码出错，如“Uncaught ReferenceError: b is not defined” 3. 明确用throw抛出错误 4. 嵌套的promise也会引发reject。内层promise造成的reject状态会冒泡，造成顶层promise也reject</li>
+<li>catch会检查promise链上位于它之前的每个地方(then和其他异步操作)；如果它之前还有另一个catch，则从那个catch之后的位置开始</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">asyncTask()</span><br><span class="line">    .then()</span><br><span class="line">    .then()</span><br><span class="line">    .then()</span><br><span class="line">    .catch() <span class="comment">//覆盖asyncTask和3个then</span></span><br><span class="line">asyncTask()</span><br><span class="line">    .catch() <span class="comment">//只覆盖asyncTask</span></span><br><span class="line">    .then()</span><br><span class="line">    .then()</span><br><span class="line">    .catch() <span class="comment">//覆盖了2个then</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>和then一样，catch也会返回一个可链式操作的新promise对象</li>
+<li>promise实例的then方法中的第二个onRejected函数可以处理错误；写Promise的时候最后写上catch函数也可以处理错误。推荐catch函数。</li>
+<li>在没有使用catch方法指定错误处理的回调函数，Promise对象抛出的错误不会传递到外层代码，即不会有任何反应。当promise被reject并且错误信息没有被处理的时候，会抛出unhandledrejection，这个错误不会被window.onerror和addEventListener(“error”)所监听到</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">window</span>.addEventListener(<span class="string">"unhandledrejection"</span>,  error =&gt; &#123;</span><br><span class="line">   <span class="built_in">console</span>.log(error.reason)</span><br><span class="line">   error.preventDefault()</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h6 id="框架的错误处理："><a href="#框架的错误处理：" class="headerlink" title="框架的错误处理："></a>框架的错误处理：</h6><p>框架会有相应的函数或者API来进行错误处理，如果没有配置，那么捕获到的错误会以 console.error 的方式输出。因此可以劫持 console.error，捕获框架中的错误并做出处理。</p>
+<h5 id="错误信息上报："><a href="#错误信息上报：" class="headerlink" title="错误信息上报："></a>错误信息上报：</h5><h6 id="采用单独域名："><a href="#采用单独域名：" class="headerlink" title="采用单独域名："></a>采用单独域名：</h6><ul>
+<li>使用单独域名，可以防止对主业务服务器的压力，能够避免日志相关处理逻辑和数据在主业务服务器的堆积</li>
+<li>另外，很多浏览器对同一个域名的请求量有并发数的限制（队头阻塞），单独域名能够充分利用现代浏览器的并发设置</li>
+</ul>
+<h6 id="独立域名的跨域问题："><a href="#独立域名的跨域问题：" class="headerlink" title="独立域名的跨域问题："></a>独立域名的跨域问题：</h6><p>对于单独的日志域名，肯定会涉及跨域问题。我们经常发现页面使用「构造空的 Image 对象的方式」进行数据上报。原因是请求图片并不涉及跨域的问题：我们可以将数据进行序列化，作为 URL 参数传递</p>
+<h6 id="何时上报数据："><a href="#何时上报数据：" class="headerlink" title="何时上报数据："></a>何时上报数据：</h6><ul>
+<li>页面加载和重新刷新</li>
+<li>页面切换路由</li>
+<li>页面所在的 Tab 标签重新变得可见</li>
+<li>页面关闭</li>
+</ul>
+<h6 id="单页应用上报："><a href="#单页应用上报：" class="headerlink" title="单页应用上报："></a>单页应用上报：</h6><p>如果切换路由是通过改变 hash 值来实现的，那么只需要监听 hashchange 事件，如果是通过 history API 来改变 URL，那么需要使用 pushState 和 replaceState 事件。当然一劳永逸的做法是进行 monkey patch，结合发布订阅模式，为相关事件的触发添加处理：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> patchMethod = <span class="function"><span class="params">type</span> =&gt;</span> <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> result = history[type].apply(<span class="keyword">this</span>, <span class="built_in">arguments</span>)</span><br><span class="line">    <span class="keyword">const</span> event = <span class="keyword">new</span> Event(type)</span><br><span class="line">    event.arguments = <span class="built_in">arguments</span></span><br><span class="line">    <span class="built_in">window</span>.dispatchEvent(event)</span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line">&#125;</span><br><span class="line">history.pushState = patchMethod(<span class="string">'pushState'</span>)</span><br><span class="line">history.replaceState = patchMethod(<span class="string">'replaceState'</span>)</span><br><span class="line"><span class="comment">//添加订阅函数，进行上报</span></span><br><span class="line"><span class="built_in">window</span>.addEventListener(<span class="string">'replaceState'</span>, e =&gt; &#123;</span><br><span class="line">   <span class="comment">// report...</span></span><br><span class="line">&#125;)</span><br><span class="line"><span class="built_in">window</span>.addEventListener(<span class="string">'pushState'</span>, e =&gt; &#123;</span><br><span class="line">   <span class="comment">// report...</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h6 id="navigator-sendBeacon："><a href="#navigator-sendBeacon：" class="headerlink" title="navigator.sendBeacon："></a>navigator.sendBeacon：</h6><p>解决「页离开时的请求发送」问题的。它的几个特点决定了对应问题的解决方案：</p>
+<ul>
+<li>它的行为是异步的，也就是说请求的发送不会阻塞向下一个页面的跳转，因此可以保证跳转的流畅度；</li>
+<li>它在不受到极端「数据 size 和队列总数」的限制下，优先返回 true 以保证请求的发送成功。</li>
+</ul>
+<p>目前 Google Analytics 使用 navigator.sendBeacon 来上报数据。</p>
+<p> Google Analytics 通过动态创建 img 标签，在 img.src 中拼接 URL 的方式发送请求，不存在跨域限制。如果 URL 太长，就会采用 sendBeacon 的方式发送请求，如果 sendBeacon 方法不兼容，则发送 AJAX post 同步请求。</p>
+<h6 id="上报行为优化："><a href="#上报行为优化：" class="headerlink" title="上报行为优化："></a>上报行为优化：</h6><ul>
+<li>设置采集率：每次上报前进行Math.random()来判定是否上报</li>
+<li>如果用户一直触发错误，相同的错误内容会不停上报，这时可以考虑是否需要做一个短时间滤重（节流）</li>
+<li>通过配置化，减少业务接入成本</li>
+</ul>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2020/04/23/%E6%B5%8F%E8%A7%88%E5%99%A8%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/">浏览器缓存机制</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© BitHobo | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>
